@@ -1,0 +1,6 @@
+rpi3 files for fanctrl
+- fanctrl.sh : script runs and check the cpu-temp every 5 seconds
+  - location: /usr/local/bin/fanctrl.sh
+- fanctrl.service : systemd file to start the script
+  - location: /lib/systemd/system/fanctrl.system
+

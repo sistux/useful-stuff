@@ -1,0 +1,14 @@
+[Unit]
+Description=Simple Fan Control
+After=ssh.service
+
+[Service]
+Type=forking
+User=root
+ExecStart=/bin/sh -c "/usr/local/bin/fanctrl.sh start"
+ExecStop=/bin/sh -c "/usr/local/bin/fanctrl.sh stop"
+Restart=always
+
+[Install]
+WantedBy=default.target
+
