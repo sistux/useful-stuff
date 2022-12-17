@@ -5,10 +5,9 @@ After=ssh.service
 [Service]
 Type=forking
 User=root
-ExecStart=/bin/sh -c "/usr/local/bin/fanctrl.sh start"
-ExecStop=/bin/sh -c "/usr/local/bin/fanctrl.sh stop"
+PIDFile=/var/run/fanctrl.pid
+ExecStart=/bin/sh -c "eval /usr/local/bin/fanctrl & sleep 1; pidof fanctrl > /var/run/fanctrl.pid"
 Restart=always
 
 [Install]
 WantedBy=default.target
-

@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -8,11 +9,19 @@
 #include <sstream>
 #include <math.h>
 
+/*! gpio for pwm0 */
 int iPWMgpio = 12;
-int iPWMfreq = 25;
+/*! pwm freq */
+int iPWMfreq = 23;
+/*! steps */
 int iStartStep = 1000000;
-int iDownStep = 100000;
-
+/*! low temp, 30% of max fan-speed */
+double dLowTemp = 50.0;
+/*! from this temperature the fan-speed will be 100% */
+double dMaxTemp = 80.0;
+/*! 30% per default */
+double dLowFanSpeed = 30.0;
+/*! cpu-temp-file */
 std::string c_strCpuTempFName = "/sys/class/thermal/thermal_zone0/temp";
 
 double getPICpuTemp(std::string strCpuTempFName = "/sys/class/thermal/thermal_zone0/temp")
@@ -28,12 +37,13 @@ double getPICpuTemp(std::string strCpuTempFName = "/sys/class/thermal/thermal_zo
 	return dPICpuTemp;
 }
 
-double dLowTemp = 45.0;
-double dMaxTemp = 80.0;
-double dLowFanSpeed = 30.0;
-
 int main(int argc, char *argv[])
 {
+	// \todo: it takes 5% of CPU, why? other pwm lib?
+	// \todo: parameters, see constants above
+	// \todo: debug-mode
+	// \todo: etc...
+
 	if (gpioInitialise() < 0) {
 		std::cout << "[ERROR] Exit! Could not initialise the pigpio-lib."
 			  << std::endl;
@@ -46,9 +56,8 @@ int main(int argc, char *argv[])
 		  << std::endl
 		  << "Current temp:" << dPICpuTemp
 		  << std::endl;
+	// initialy for 3 seconds enable it at 100% just for test if it works
 	gpioHardwarePWM(iPWMgpio, iPWMfreq, iStartStep);
-	// gpioSetPWMfrequency	Configure PWM frequency for a GPIO
-	// gpioSetPWMrange	Configure PWM range for a GPIO
 	printf("Current state:\n");
 	printf("\tgpio:%i", iPWMgpio);
 	printf("\tdutycycle:%i", gpioGetPWMdutycycle(iPWMgpio));
@@ -67,17 +76,17 @@ int main(int argc, char *argv[])
 			double dProc = (dMaxTemp - dLowTemp) / 70.0;
 			iCurFanStep = 30 + (dPICpuTemp - dLowTemp) / dProc;
 		}
-		std::cout << ":" << iCurFanStep << ":" << dPICpuTemp << std::endl;
+		// std::cout << ":" << iCurFanStep << ":" << dPICpuTemp << std::endl;
 		iCurFanStep = iCurFanStep * iStartStep / 100;
 		gpioHardwarePWM(iPWMgpio, iPWMfreq, iCurFanStep);
-		sleep(3);
+		sleep(5);
 		dPICpuTemp = getPICpuTemp();
 	}
-	getchar();
 
 	gpioHardwarePWM(iPWMgpio, 0, 0);
 	gpioTerminate();
 
+	getchar();
+
 	return 0;
 }
-
