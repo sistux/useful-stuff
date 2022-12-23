@@ -6,7 +6,8 @@ After=ssh.service
 Type=forking
 User=root
 PIDFile=/var/run/fanctrl.pid
-ExecStart=/bin/sh -c "eval /usr/local/bin/fanctrl & sleep 1; pidof fanctrl > /var/run/fanctrl.pid"
+ExecStart=/bin/sh -c /usr/local/bin/fanctrlpwm.sh start
+ExecStop=/bin/sh -c /usr/local/bin/fanctrlpwm.sh stop
 Restart=always
 
 [Install]

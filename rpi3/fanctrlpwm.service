@@ -1,0 +1,15 @@
+[Unit]
+Description=Simple Fan Control
+After=ssh.service
+
+[Service]
+Type=forking
+User=root
+ExecStart=/bin/sh -c "/usr/local/bin/fanctrlpwm.sh start"
+ExecStop=/bin/sh -c "/usr/local/bin/fanctrlpwm.sh stop"
+ExecStartPost=/bin/sh -c "echo $MAINPID > /var/run/fanctrlpwm.pid"
+PIDFile=/var/run/fanctrlpwm.pid
+Restart=always
+
+[Install]
+WantedBy=default.target
